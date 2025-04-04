@@ -1,75 +1,76 @@
 package BankServices;
 
+import library.list.MyArrayList;
+import library.list.MyList;
+
 public class Account {
-	private final int accountNumber;
-	private final String ownerName;
-	private int date;
-	private double deposit;
-	private final MyList deposits;
-	private final MyList withdrawals;
-	private final MyList operations;
+    private final String owner;
+    private int date;
+    private double balance;
+    private final int accountNumber;
+    private final MyList deposits;
+    private final MyList withdrawals;
+    private final MyList operations;
 
-	public Account(int accountNumber, String ownerName, int date, double deposit) {
-		this.accountNumber = accountNumber;
-		this.ownerName = ownerName;
-		this.date = date;
-		this.deposit = deposit;
-		this.deposits = new MyList();
-		this.withdrawals = new MyList();
-		this.operations = new MyList();
+    public Account(int accountNumber,String owner, int date, double balance){
+        this.accountNumber = accountNumber;
+        this.owner = owner;
+        this.date = date;
+        this.balance = balance;
+        this.deposits = new MyArrayList();
+        this.withdrawals = new MyArrayList();
+        this.operations = new MyArrayList();
 
-		Deposit initialDeposit = new Deposit(deposit, date);
-		operations.add(initialDeposit);
-		deposits.add(initialDeposit);
-	}
+    }
 
-	public int getDate() {
-		return date;
-	}
+    @Override
+    public String toString(){
+        return accountNumber + "," + owner + "," + date + "," + balance;
+    }
 
-	public void setDate(int date) {
-		if (this.date < date) {
-			this.date = date;
-		}
-	}
+    public MyList getMovements(){
+        return operations;
+    }
 
-	public double getDeposite() {
-		return deposit;
-	}
+    public double getBalance(){
+        return balance;
+    }
 
-	public void setAmountDeposits(double amount) {
-		Deposit newDeposit = new Deposit(amount, this.date);
-		operations.add(newDeposit);
-		deposits.add(newDeposit);
-		this.deposit += amount;
-	}
+    public void setBalance(double balance){
+        this.balance = balance;
+    }
 
-	public void setAmountWithdraw(double amount) {
-		Withdrawal newWithdrawal = new Withdrawal(amount, this.date);
-		operations.add(newWithdrawal);
-		withdrawals.add(newWithdrawal);
-		this.deposit -= amount;
-	}
+    public int getDate(){
+        return date;
+    }
 
-	public MyList getDeposits() {
-		return deposits;
-	}
+    public void setDate(int date){
+        if (this.date < date){
+            this.date = date;
+        }
+    }
 
-	public MyList getWithdrawals() {
-		return withdrawals;
-	}
 
-	public MyList getMovements() {
-		return operations;
-	}
+    public MyList getDeposits(){
+        return deposits;
+    }
 
-	@Override
-	public String toString() {
-		return "Account[" +
-				accountNumber +
-				", " + ownerName +
-				", " + date +
-				", " + deposit +
-				']';
-	}
+    public void setAmountDeposites(double amount){
+        deposits.add(new Deposit(amount,date));
+        operations.add(new Deposit(amount,date));
+        balance += amount;
+    }
+
+    public void setAmountWithdraw(double amount){
+        withdrawals.add(new Withdrawal(amount,date));
+        operations.add(new Withdrawal(amount,date));
+        balance -= amount;
+
+    }
+
+    public MyList getWithdrawals(){
+        return withdrawals;
+    }
+
+
 }
