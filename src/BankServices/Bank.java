@@ -140,7 +140,6 @@ public class Bank {
     public MyList getAccounts() {
         return allAccounts;
     }
-
     public MyList getAccountsByBalance(double lower, double upper) {
         for (int i = 0; i < accountCount; i++) {
             double balance = accounts[i].getDeposite();

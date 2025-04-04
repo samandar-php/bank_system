@@ -14,7 +14,6 @@ public class Account {
 		this.ownerName = ownerName;
 		this.date = date;
 		this.deposit = deposit;
-
 		this.deposits = new MyList();
 		this.withdrawals = new MyList();
 		this.operations = new MyList();

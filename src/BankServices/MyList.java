@@ -9,7 +9,6 @@ public class MyList {
     public MyList() {
         elements = new Object[count];
     }
-
     public Object get(int index) {
         if (index >= 0 && index < size) {
             return elements[index];

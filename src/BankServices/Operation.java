@@ -8,7 +8,6 @@ public abstract class Operation {
 		this.amount = amount;
 		this.date = date;
 	}
-
 	@Override
 	public abstract String toString();
 }
