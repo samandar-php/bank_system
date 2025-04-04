@@ -1,6 +1,13 @@
-package BankServices;
+package Main;
 
-public class Main {
+import BankServices.Account;
+import BankServices.Bank;
+import BankServices.Deposit;
+import BankServices.Operation;
+import BankServices.Withdrawal;
+import library.list.MyList;
+
+public class MainClass {
 
     public static void main(String[] args) {
         Bank b1 = new Bank("Uncle-$crooge");
@@ -9,6 +16,7 @@ public class Main {
         int c3 = b1.createAccount("John", 20,  800.);
         int c4 = b1.createAccount("Paul", 30, 252.4);
         Account a1, a3;
+
         b1.deposit(c1, 7, 360.0);
         b1.deposit(c4, 35, 270.0);
         b1.withdraw(c3, 28, 350.0);
@@ -129,4 +137,3 @@ public class Main {
     }
 
 }
-

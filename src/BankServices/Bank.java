@@ -1,161 +1,146 @@
 package BankServices;
 
+
+import library.list.MyArrayList;
+import library.list.MyList;
+
 public class Bank {
     private final String name;
     private final Account[] accounts;
-    public static final int count = 5;
-    private int accountCount = 0;
     private double totalMoney;
-    private final MyList allAccounts;
-    private final MyList zeroAccounts;
-    private final MyList accountsByBalance;
-    private final MyList numberHigher;
+    private final MyArrayList allAccounts;
+    private final MyArrayList zeroAccounts;
+    private final MyArrayList accountsByBalance;
+    private final MyArrayList numberHigher;
 
-    public Bank(String name) {
+    public static final int DEFAULT_CAPACITY = 10;
+
+    private int accountId = 0;
+
+    public Bank(String name){
         this.name = name;
-        accounts = new Account[count];
-        allAccounts = new MyList();
-        zeroAccounts = new MyList();
-        accountsByBalance = new MyList();
-        numberHigher = new MyList();
+        accounts = new Account[DEFAULT_CAPACITY];
+        allAccounts = new MyArrayList();
+        zeroAccounts = new MyArrayList();
+        numberHigher = new MyArrayList();
+        accountsByBalance = new MyArrayList();
+
     }
 
-    public String getName() {
+    public String getName(){
         return name;
     }
 
-    public int createAccount(String ownerName, int date, double deposit) {
-        accounts[accountCount] = new Account(accountCount + 1, ownerName, date, deposit);
-        allAccounts.add(accounts[accountCount]);
-        setTotalMoney(deposit);
-        return ++accountCount;
+    public int createAccount(String name,int date,double initial){
+        accounts[accountId++] = new Account(accountId,name,date,initial);
+
+        allAccounts.add(accounts[accountId - 1]);
+        setTotalMoney(initial);
+
+        return accountId;
     }
 
-    public Account getAccount(int id) {
-        if (id > accountCount || id <= 0) {
-            System.err.println("Invalid account ID.");
-            return null;
-        }
-
-        if (close(id)) {
-            System.err.println("This account is closed.");
-            System.err.println("This account was closed on: " + accounts[id - 1].getDate());
-            return null;
-        }
-
-        return accounts[id - 1];
-    }
-
-    public void deposit(int id, int date, double amount) {
-        if (id > accountCount || id <= 0) {
-            System.err.println("Invalid account ID.");
-            return;
-        }
-
-        if (close(id)) {
-            System.err.println("This account is closed.");
-            return;
-        }
-
-        setTotalMoney(amount);
+    public Account deleteAccount(int id, int date){
+       if (id <= 0 || id > accountId){
+           System.err.println("Error, Noto'g'ri account ID");
+           return null;
+       }
         accounts[id - 1].setDate(date);
-        accounts[id - 1].setAmountDeposits(amount);
-    }
-
-    public void withdraw(int id, int date, double amount) {
-        if (id > accountCount || id <= 0) {
-            System.err.println("Invalid account ID.");
-            return;
-        }
-
-        if (close(id)) {
-            System.err.println("This account is closed.");
-            return;
-        }
-
-        if (amount > accounts[id - 1].getDeposite()) {
-            System.err.println("Withdrawal amount exceeds current balance.");
-            return;
-        }
-
-        if (accounts[id - 1].getDate() > date) {
-            date = accounts[id - 1].getDate();
-        }
-
-        accounts[id - 1].setDate(date);
-        accounts[id - 1].setAmountWithdraw(amount);
-    }
-
-    public void transfer(int id, int transferId, int date, double amount) {
-        if (id > accountCount || transferId > accountCount || id <= 0 || transferId <= 0) {
-            System.err.println("Invalid account ID(s).");
-            return;
-        }
-
-        if (close(id) || close(transferId)) {
-            System.err.println("One or both accounts are closed.");
-            return;
-        }
-
-        if (accounts[id - 1].getDeposite() < amount) {
-            System.err.println("Insufficient funds for transfer.");
-            return;
-        }
-
-        accounts[id - 1].setDate(date);
-        accounts[transferId - 1].setDate(date);
-        accounts[id - 1].setAmountWithdraw(amount);
-        accounts[transferId - 1].setAmountDeposits(amount);
-    }
-
-    public Account deleteAccount(int id, int date) {
-        if (id > accountCount || id <= 0) {
-            System.err.println("Invalid account ID.");
-            return null;
-        }
-
-        if (close(id)) {
-            System.err.println("This account is already closed.");
-            return accounts[id - 1];
-        }
-
-        accounts[id - 1].setDate(date);
-        accounts[id - 1].setAmountWithdraw(accounts[id - 1].getDeposite());
+        accounts[id - 1].setBalance(0);
         zeroAccounts.add(accounts[id - 1]);
         return accounts[id - 1];
+
     }
 
-    public double getTotalDeposit() {
+    public void deposit(int id, int date, double value){
+        if(isValid(id)){
+            System.err.println("This account is closed");
+            return;
+        }
+        accounts[id - 1].setDate(Math.max(accounts[id - 1].getDate(), date));
+        accounts[id - 1].setBalance(accounts[id - 1].getBalance() + value);
+        accounts[id - 1].getDeposits().add(new Deposit(value, date));
+    }
+
+    public void withdraw(int id,int date,double value){
+        if(isValid(id)){
+            System.err.println("This account is closed");
+            return;
+        }
+        if(accounts[id - 1].getBalance() < value){
+            System.err.println("Insufficient balance");
+            return;
+        }
+        accounts[id - 1].setDate(Math.max(accounts[id - 1].getDate(), date));
+        accounts[id - 1].setBalance(accounts[id - 1].getBalance() - value);
+        accounts[id - 1].getWithdrawals().add(new Withdrawal(value, date));
+    }
+
+    public void transfer(int fromId,int toId,int date,double amount){
+        if(isValid(fromId)||isValid(toId)){
+            System.err.println("This account closed");
+            return;
+        } else {
+            if (fromId > accountId || toId > accountId || fromId <= 0 || toId <= 0) {
+                System.err.println("Error");
+                return;
+            }
+
+            if (accounts[toId - 1].getBalance() < amount) {
+                System.err.println("Error  transfer");
+                return;
+            }
+
+            accounts[toId - 1].setDate(Math.max(accounts[toId - 1].getDate(),date));
+            accounts[fromId - 1].setDate(Math.max(accounts[fromId - 1].getDate(),date));
+            accounts[toId - 1].setBalance(accounts[toId - 1].getBalance() - amount);
+            accounts[fromId - 1].setBalance(accounts[fromId - 1].getBalance() + amount);
+            accounts[fromId - 1].getWithdrawals().add(new Withdrawal(amount, date));
+            accounts[toId - 1].getDeposits().add(new Deposit(amount, date));
+        }
+    }
+
+    public double getTotalDeposit(){
         return totalMoney;
     }
 
-    public void setTotalMoney(double amount) {
-        this.totalMoney += amount;
+    public void setTotalMoney(double initial){
+        this.totalMoney += initial;
     }
 
-    public boolean close(int id) {
-        return accounts[id - 1].getDeposite() == 0;
-    }
-
-    public MyList getAccounts() {
+    public MyList getAccounts(){
         return allAccounts;
     }
-    public MyList getAccountsByBalance(double lower, double upper) {
-        for (int i = 0; i < accountCount; i++) {
-            double balance = accounts[i].getDeposite();
-            if (balance > lower && balance < upper) {
+
+    public Account getAccount(int id){
+        return accounts[id - 1];
+    }
+
+    public MyList getZeroAccounts(){
+        return zeroAccounts;
+    }
+
+    public MyList getAccountsByBalance(double low,double high){
+        accountsByBalance.clear();
+        for (int i = 0; i < accountId; i++) {
+            if (accounts[i].getBalance() >= low && accounts[i].getBalance() <= high){
                 accountsByBalance.add(accounts[i]);
             }
         }
         return accountsByBalance;
     }
 
-    public MyList getNumberHigher(double amount) {
-        for (int i = 0; i < accountCount; i++) {
-            if (accounts[i].getDeposite() >= amount) {
-                numberHigher.add(accounts[i]);
+    public long getNumberHigher(double min){
+        int count = 0;
+        for (int i = 0;i < accountId;i++){
+            if (accounts[i].getBalance() >= min){
+                count++;
             }
         }
-        return numberHigher;
+        return count;
+    }
+
+    public boolean isValid(int id){
+        return accounts[id - 1].getBalance() == 0;
     }
 }
