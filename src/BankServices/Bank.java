@@ -11,7 +11,6 @@ public class Bank {
     private final MyArrayList allAccounts;
     private final MyArrayList zeroAccounts;
     private final MyArrayList accountsByBalance;
-    private final MyArrayList numberHigher;
 
     public static final int DEFAULT_CAPACITY = 10;
 
@@ -22,7 +21,6 @@ public class Bank {
         accounts = new Account[DEFAULT_CAPACITY];
         allAccounts = new MyArrayList();
         zeroAccounts = new MyArrayList();
-        numberHigher = new MyArrayList();
         accountsByBalance = new MyArrayList();
 
     }
@@ -79,7 +77,6 @@ public class Bank {
     public void transfer(int fromId,int toId,int date,double amount){
         if(isValid(fromId)||isValid(toId)){
             System.err.println("This account closed");
-            return;
         } else {
             if (fromId > accountId || toId > accountId || fromId <= 0 || toId <= 0) {
                 System.err.println("Error");
