@@ -40,7 +40,7 @@ public class Bank {
 
     public Account deleteAccount(int id, int date){
        if (id <= 0 || id > accountId){
-           System.err.println("Error, Noto'g'ri account ID");
+           System.err.println("Error,error account ID");
            return null;
        }
         accounts[id - 1].setDate(date);
